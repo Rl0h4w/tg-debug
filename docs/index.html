@@ -1,65 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Telegram WebApp Debug</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
-    <script>
-        function updateInfo() {
-            const infoDiv = document.getElementById('info');
-            const webAppData = window.Telegram?.WebApp;
-            
-            let info = {
-                platform: webAppData?.platform,
-                version: webAppData?.version,
-                colorScheme: webAppData?.colorScheme,
-                themeParams: webAppData?.themeParams,
-                isExpanded: webAppData?.isExpanded,
-                viewportHeight: webAppData?.viewportHeight,
-                viewportStableHeight: webAppData?.viewportStableHeight,
-                headerColor: webAppData?.headerColor,
-                backgroundColor: webAppData?.backgroundColor,
-                isClosingConfirmationEnabled: webAppData?.isClosingConfirmationEnabled,
-                initData: webAppData?.initData,
-                initDataUnsafe: webAppData?.initDataUnsafe,
-            };
-
-            // Add user agent
-            info.userAgent = navigator.userAgent;
-            
-            // Add screen info
-            info.screen = {
-                width: window.screen.width,
-                height: window.screen.height,
-                availWidth: window.screen.availWidth,
-                availHeight: window.screen.availHeight,
-                pixelRatio: window.devicePixelRatio
-            };
-
-            // Format and display the data
-            infoDiv.innerHTML = `<pre><code class="json">${JSON.stringify(info, null, 2)}</code></pre>`;
-            hljs.highlightAll();
-        }
-    </script>
+    <title>User-Agent Test</title>
 </head>
 <body style="padding: 20px; font-family: Arial, sans-serif;">
-    <h1>Telegram WebApp Debug Info</h1>
-    <button onclick="updateInfo()" style="margin-bottom: 20px; padding: 10px;">Обновить данные</button>
-    <div id="info">
-        <p>Нажмите кнопку "Обновить данные" для получения информации...</p>
-    </div>
+    <h2>User-Agent Test</h2>
+    
+    <h3>Navigator User-Agent:</h3>
+    <pre id="navUserAgent" style="background: #f0f0f0; padding: 10px;"></pre>
+    
+    <h3>URL Parameters:</h3>
+    <pre id="urlParams" style="background: #f0f0f0; padding: 10px;"></pre>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            if (window.Telegram?.WebApp) {
-                window.Telegram.WebApp.ready();
-                updateInfo();
-            } else {
-                document.getElementById('info').innerHTML = 
-                    '<p style="color: red;">Telegram WebApp не обнаружен. ' +
-                    'Эта страница должна быть открыта через Telegram WebApp.</p>';
-            }
-        });
+        // Показываем реальный User-Agent
+        document.getElementById('navUserAgent').textContent = navigator.userAgent;
+        
+        // Показываем параметры из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramsObj = {};
+        for(const [key, value] of urlParams) {
+            paramsObj[key] = value;
+        }
+        document.getElementById('urlParams').textContent = JSON.stringify(paramsObj, null, 2);
     </script>
 </body>
 </html>
