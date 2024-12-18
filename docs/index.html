@@ -1,25 +1,133 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Redirect to Mobile Yandex.Eda</title>
-    <script>
-    window.onload = function() {
-        var userAgent = "Mozilla/5.0 (Linux; U; Android 4.0.2; en-us; Galaxy Nexus Build/ICL53F) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30";
-        var redirectUrl = "https://eda.yandex.ru/?eats_mobile=1&eats_platform=android&mobile=1&shippingType=delivery";
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", redirectUrl, true);
-        xhr.setRequestHeader("User-Agent", userAgent);
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                window.location.href = redirectUrl;
-            }
-        };
-        xhr.send();
-    }
-</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android Emulator Redirect</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        #urlInput {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        #redirectButton {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #redirectButton:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <p>Перенаправление на мобильную версию Яндекс.Еды...</p>
+    <h2>Эмулятор Android веб-приложения</h2>
+    <input type="url" id="urlInput" placeholder="Введите URL для перенаправления">
+    <button id="redirectButton" onclick="redirect()">Перейти</button>
+
+    <script>
+        // Конфигурация Android-устройства
+        const ANDROID_CONFIG = {
+            userAgent: 'Mozilla/5.0 (Linux; Android 12; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+            screenWidth: 412,
+            screenHeight: 915,
+            deviceScaleFactor: 2.625
+        };
+
+        // Функция для установки User Agent
+        function setAndroidUserAgent() {
+            Object.defineProperty(navigator, 'userAgent', {
+                get: function() {
+                    return ANDROID_CONFIG.userAgent;
+                }
+            });
+        }
+
+        // Функция для эмуляции размеров экрана
+        function setScreenMetrics() {
+            if (window.screen) {
+                Object.defineProperty(window.screen, 'width', {
+                    get: () => ANDROID_CONFIG.screenWidth
+                });
+                Object.defineProperty(window.screen, 'height', {
+                    get: () => ANDROID_CONFIG.screenHeight
+                });
+                Object.defineProperty(window.screen, 'devicePixelRatio', {
+                    get: () => ANDROID_CONFIG.deviceScaleFactor
+                });
+            }
+        }
+
+        // Функция перенаправления с эмуляцией
+        function redirect() {
+            const targetUrl = document.getElementById('urlInput').value;
+            
+            if (!targetUrl) {
+                alert('Пожалуйста, введите URL');
+                return;
+            }
+
+            try {
+                // Создаём новое окно с эмулированными параметрами
+                const newWindow = window.open('', '_blank');
+                if (newWindow) {
+                    newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        </head>
+                        <body>
+                            <script>
+                                // Копируем конфигурацию
+                                const ANDROID_CONFIG = ${JSON.stringify(ANDROID_CONFIG)};
+                                
+                                // Устанавливаем User Agent
+                                Object.defineProperty(navigator, 'userAgent', {
+                                    get: () => ANDROID_CONFIG.userAgent
+                                });
+
+                                // Устанавливаем метрики экрана
+                                if (window.screen) {
+                                    Object.defineProperty(window.screen, 'width', {
+                                        get: () => ANDROID_CONFIG.screenWidth
+                                    });
+                                    Object.defineProperty(window.screen, 'height', {
+                                        get: () => ANDROID_CONFIG.screenHeight
+                                    });
+                                    Object.defineProperty(window.screen, 'devicePixelRatio', {
+                                        get: () => ANDROID_CONFIG.deviceScaleFactor
+                                    });
+                                }
+
+                                // Перенаправляем на целевой URL
+                                window.location.href = "${targetUrl}";
+                            <\/script>
+                        </body>
+                        </html>
+                    `);
+                } else {
+                    alert('Пожалуйста, разрешите всплывающие окна для этого сайта');
+                }
+            } catch (error) {
+                alert('Произошла ошибка: ' + error.message);
+            }
+        }
+
+        // Инициализация эмуляции при загрузке страницы
+        window.onload = function() {
+            setAndroidUserAgent();
+            setScreenMetrics();
+        };
+    </script>
 </body>
 </html>
